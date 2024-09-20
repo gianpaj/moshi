@@ -11,7 +11,7 @@ export const useSocket = ({
   uri: string;
   onDisconnect?: () => void;
 }) => {
-  const lastMessageTime = useRef<null|number>(null);
+  const lastMessageTime = useRef<null | number>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
@@ -68,20 +68,23 @@ export const useSocket = ({
   }, [uri, onMessage, onDisconnectProp]);
 
   const stop = useCallback(() => {
-      setIsConnected(false);
-      if (onDisconnectProp) {
-        onDisconnectProp();
-      }
-      socket?.close();
-      setSocket(null);
+    setIsConnected(false);
+    if (onDisconnectProp) {
+      onDisconnectProp();
+    }
+    socket?.close();
+    setSocket(null);
   }, [socket]);
 
   useEffect(() => {
-    if(!isConnected){
+    if (!isConnected) {
       return;
     }
     let intervalId = setInterval(() => {
-      if (lastMessageTime.current && Date.now() - lastMessageTime.current > 10000) {
+      if (
+        lastMessageTime.current &&
+        Date.now() - lastMessageTime.current > 10000
+      ) {
         console.log("closing socket due to inactivity", socket);
         socket?.close();
         onDisconnect();

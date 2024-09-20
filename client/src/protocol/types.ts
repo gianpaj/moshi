@@ -40,12 +40,12 @@ export type WSMessage =
       data: unknown;
     }
   | {
-    type: "error";
-    data: string;
-  }
+      type: "error";
+      data: string;
+    }
   | {
-    type:"ping";
-  }
+      type: "ping";
+    };
 
 export const CONTROL_MESSAGES_MAP = {
   start: 0b00000000,

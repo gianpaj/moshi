@@ -1,8 +1,5 @@
 import ReactDOM from "react-dom/client";
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 // @ts-expect-error - Worker is not recognized by the TS compiler
 import { DecoderWorker } from "./decoder/decoderWorker";
@@ -16,5 +13,5 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-    <RouterProvider router={router}/>
+  <RouterProvider router={router} />,
 );

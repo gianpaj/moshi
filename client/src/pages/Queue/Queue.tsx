@@ -1,5 +1,12 @@
 import moshiProcessorUrl from "../../audio-processor.ts?worker&url";
-import { FC, useEffect, useState, useCallback, useRef, MutableRefObject } from "react";
+import {
+  FC,
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  MutableRefObject,
+} from "react";
 import eruda from "eruda";
 import { useSearchParams } from "react-router-dom";
 import { Conversation } from "../Conversation/Conversation";
@@ -8,11 +15,13 @@ import { useModelParams } from "../Conversation/hooks/useModelParams";
 import { ModelParams } from "../Conversation/components/ModelParams/ModelParams";
 import { env } from "../../env";
 
-export const Queue:FC = () => {
+export const Queue: FC = () => {
   const [searchParams] = useSearchParams();
   const overrideWorkerAddr = searchParams.get("worker_addr");
-  const [hasMicrophoneAccess, setHasMicrophoneAccess] = useState<boolean>(false);
-  const [showMicrophoneAccessMessage, setShowMicrophoneAccessMessage] = useState<boolean>(false);
+  const [hasMicrophoneAccess, setHasMicrophoneAccess] =
+    useState<boolean>(false);
+  const [showMicrophoneAccessMessage, setShowMicrophoneAccessMessage] =
+    useState<boolean>(false);
   const [shouldConnect, setShouldConnect] = useState<boolean>(false);
   const modelParams = useModelParams();
   const modalRef = useRef<HTMLDialogElement>(null);
@@ -21,11 +30,11 @@ export const Queue:FC = () => {
   const worklet = useRef<AudioWorkletNode | null>(null);
   // enable eruda in development
   useEffect(() => {
-    if(env.VITE_ENV === "development") {
+    if (env.VITE_ENV === "development") {
       eruda.init();
     }
     () => {
-      if(env.VITE_ENV === "development") {
+      if (env.VITE_ENV === "development") {
         eruda.destroy();
       }
     };
@@ -36,41 +45,41 @@ export const Queue:FC = () => {
       await window.navigator.mediaDevices.getUserMedia({ audio: true });
       setHasMicrophoneAccess(true);
       return true;
-    } catch(e) {
+    } catch (e) {
       console.error(e);
       setShowMicrophoneAccessMessage(true);
       setHasMicrophoneAccess(false);
     }
     return false;
-}, [setHasMicrophoneAccess, setShowMicrophoneAccessMessage]);
+  }, [setHasMicrophoneAccess, setShowMicrophoneAccessMessage]);
 
   const startProcessor = useCallback(async () => {
-    if(!audioContext.current) {
+    if (!audioContext.current) {
       audioContext.current = new AudioContext();
     }
-    if(worklet.current) {
+    if (worklet.current) {
       return;
     }
     let ctx = audioContext.current;
     ctx.resume();
     try {
-      worklet.current = new AudioWorkletNode(ctx, 'moshi-processor');
+      worklet.current = new AudioWorkletNode(ctx, "moshi-processor");
     } catch (err) {
       await ctx.audioWorklet.addModule(moshiProcessorUrl);
-      worklet.current = new AudioWorkletNode(ctx, 'moshi-processor');
+      worklet.current = new AudioWorkletNode(ctx, "moshi-processor");
     }
     worklet.current.connect(ctx.destination);
   }, [audioContext, worklet]);
 
-  const onConnect = useCallback(async() => {
-      await startProcessor();
-      const hasAccess = await getMicrophoneAccess();
-      if(hasAccess) {
-        setShouldConnect(true);
-      }
+  const onConnect = useCallback(async () => {
+    await startProcessor();
+    const hasAccess = await getMicrophoneAccess();
+    if (hasAccess) {
+      setShouldConnect(true);
+    }
   }, [setShouldConnect, startProcessor, getMicrophoneAccess]);
 
-  if(hasMicrophoneAccess && audioContext.current && worklet.current) {
+  if (hasMicrophoneAccess && audioContext.current && worklet.current) {
     return (
       <Conversation
         workerAddr={overrideWorkerAddr ?? ""}
@@ -82,7 +91,7 @@ export const Queue:FC = () => {
   }
 
   return (
-    <div className="text-white text-center h-screen w-screen p-4 flex flex-col items-center ">
+    <div className="flex h-screen w-screen flex-col items-center p-4 text-center text-white">
       <div>
         <h1 className="text-4xl">Moshi</h1>
         {/*
@@ -92,41 +101,90 @@ export const Queue:FC = () => {
           Font size can be changed by changing the text-sm class to text-lg or text-xl. (see : https://tailwindcss.com/docs/font-size)
           As for the links you can use the one below as an example and add more by copying it and changing the href and text.
         */}
-        <div className="pt-8 text-sm flex justify-center items-center flex-col ">
+        <div className="flex flex-col items-center justify-center pt-8 text-sm">
           <div className="presentation text-left">
-          <p><span className='cute-words'>Moshi</span> is an experimental conversational AI. </p>
-          <p>Take everything it says with a grain of <span className='cute-words'>salt</span>.</p>
-          <p>Conversations are limited to <span className='cute-words'>5 min</span>.</p>
-          <p>Moshi <span className='cute-words'>thinks</span> and <span className='cute-words'>speaks</span> at the same time.</p>
-          <p>Moshi can <span className='cute-words'>listen</span> and <span className='cute-words'>talk</span> at all time: <br/>maximum flow between you and <span className='cute-words'>Moshi</span>.</p>
-          <p>Ask it to do some <span className='cute-words'>Pirate</span> role play, how to make <span className='cute-words'>Lasagna</span>,
-            or what <span className='cute-words'>movie</span> it watched last.</p>
-          <p>We strive to support all browsers, Chrome works best.</p>
-          <p>Baked with &lt;3 @<a href="https://kyutai.org/" className='cute-words underline'>Kyutai</a>.</p>
+            <p>
+              <span className="cute-words">Moshi</span> is an experimental
+              conversational AI.{" "}
+            </p>
+            <p>
+              Take everything it says with a grain of{" "}
+              <span className="cute-words">salt</span>.
+            </p>
+            <p>
+              Conversations are limited to{" "}
+              <span className="cute-words">5 min</span>.
+            </p>
+            <p>
+              Moshi <span className="cute-words">thinks</span> and{" "}
+              <span className="cute-words">speaks</span> at the same time.
+            </p>
+            <p>
+              Moshi can <span className="cute-words">listen</span> and{" "}
+              <span className="cute-words">talk</span> at all time: <br />
+              maximum flow between you and{" "}
+              <span className="cute-words">Moshi</span>.
+            </p>
+            <p>
+              Ask it to do some <span className="cute-words">Pirate</span> role
+              play, how to make <span className="cute-words">Lasagna</span>, or
+              what <span className="cute-words">movie</span> it watched last.
+            </p>
+            <p>We strive to support all browsers, Chrome works best.</p>
+            <p>
+              Baked with &lt;3 @
+              <a href="https://kyutai.org/" className="cute-words underline">
+                Kyutai
+              </a>
+              .
+            </p>
           </div>
         </div>
       </div>
-      <div className="flex flex-grow justify-center items-center flex-col">
+      <div className="flex flex-grow flex-col items-center justify-center">
         <>
-          {showMicrophoneAccessMessage &&
-            <p className="text-center">Please enable your microphone before proceeding</p>
-          }
+          {showMicrophoneAccessMessage && (
+            <p className="text-center">
+              Please enable your microphone before proceeding
+            </p>
+          )}
           <Button onClick={async () => await onConnect()}>Connect</Button>
-          <Button className="absolute top-4 right-4" onClick={()=> modalRef.current?.showModal()}>Settings</Button>
-            <dialog ref={modalRef} className="modal">
-              <div className="modal-box border-2 border-white rounded-none flex justify-center bg-black">
-                <ModelParams {...modelParams} isConnected={shouldConnect} modal={modalRef}/>
-              </div>
-              <form method="dialog" className="modal-backdrop">
-                <button>Close</button>
-              </form>
-            </dialog>
+          <Button
+            className="absolute right-4 top-4"
+            onClick={() => modalRef.current?.showModal()}
+          >
+            Settings
+          </Button>
+          <dialog ref={modalRef} className="modal">
+            <div className="modal-box flex justify-center rounded-none border-2 border-white bg-black">
+              <ModelParams
+                {...modelParams}
+                isConnected={shouldConnect}
+                modal={modalRef}
+              />
+            </div>
+            <form method="dialog" className="modal-backdrop">
+              <button>Close</button>
+            </form>
+          </dialog>
         </>
       </div>
-      <div className="text-center flex justify-end items-center flex-col">
-        <a target="_blank" href="https://kyutai.org/moshi-terms.pdf" className="text-center">Terms of Use</a>
-        <a target="_blank" href="https://kyutai.org/moshi-privacy.pdf" className="text-center">Privacy Policy</a>
+      <div className="flex flex-col items-center justify-end text-center">
+        <a
+          target="_blank"
+          href="https://kyutai.org/moshi-terms.pdf"
+          className="text-center"
+        >
+          Terms of Use
+        </a>
+        <a
+          target="_blank"
+          href="https://kyutai.org/moshi-privacy.pdf"
+          className="text-center"
+        >
+          Privacy Policy
+        </a>
       </div>
     </div>
-  )
+  );
 };

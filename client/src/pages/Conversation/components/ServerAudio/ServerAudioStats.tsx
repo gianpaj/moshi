@@ -16,15 +16,17 @@ type ServerAudioStatsProps = {
 export const ServerAudioStats = ({ getAudioStats }: ServerAudioStatsProps) => {
   const [audioStats, setAudioStats] = useState(getAudioStats.current());
 
-  const movingAverageSum = useRef<number>(0.);
-  const movingAverageCount = useRef<number>(0.);
+  const movingAverageSum = useRef<number>(0);
+  const movingAverageCount = useRef<number>(0);
   const movingBeta = 0.85;
 
   let convertMinSecs = (total_secs: number) => {
     // convert secs to the format mm:ss.cc
-    let mins = (Math.floor(total_secs / 60)).toString();
+    let mins = Math.floor(total_secs / 60).toString();
     let secs = (Math.floor(total_secs) % 60).toString();
-    let cents = (Math.floor(100 * (total_secs - Math.floor(total_secs)))).toString();
+    let cents = Math.floor(
+      100 * (total_secs - Math.floor(total_secs)),
+    ).toString();
     if (secs.length < 2) {
       secs = "0" + secs;
     }
@@ -42,7 +44,6 @@ export const ServerAudioStats = ({ getAudioStats }: ServerAudioStatsProps) => {
       movingAverageCount.current += (1 - movingBeta) * 1;
       movingAverageSum.current *= movingBeta;
       movingAverageSum.current += (1 - movingBeta) * newAudioStats.delay;
-
     }, 141);
     return () => {
       clearInterval(interval);
@@ -50,7 +51,7 @@ export const ServerAudioStats = ({ getAudioStats }: ServerAudioStatsProps) => {
   }, []);
 
   return (
-    <div className="w-full border-2 border-white p-2 text-white ">
+    <div className="w-full border-2 border-white p-2 text-white">
       <h2 className="text-md pb-2">Server Audio Stats</h2>
       <table>
         <tbody>
@@ -64,11 +65,18 @@ export const ServerAudioStats = ({ getAudioStats }: ServerAudioStatsProps) => {
           </tr>
           <tr>
             <td className="text-md pr-2">Latency: </td>
-            <td>{(movingAverageSum.current / movingAverageCount.current).toFixed(3)}</td>
+            <td>
+              {(movingAverageSum.current / movingAverageCount.current).toFixed(
+                3,
+              )}
+            </td>
           </tr>
           <tr>
             <td className="text-md pr-2">Min/Max buffer: </td>
-            <td>{audioStats.minPlaybackDelay.toFixed(3)} / {audioStats.maxPlaybackDelay.toFixed(3)}</td>
+            <td>
+              {audioStats.minPlaybackDelay.toFixed(3)} /{" "}
+              {audioStats.maxPlaybackDelay.toFixed(3)}
+            </td>
           </tr>
         </tbody>
       </table>

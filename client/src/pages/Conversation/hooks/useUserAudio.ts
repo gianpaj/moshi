@@ -26,7 +26,8 @@ export const useUserAudio = ({
   onRecordingStart = () => {},
   onRecordingStop = () => {},
 }: useUserAudioArgs) => {
-  const { audioStreamDestination, audioContext, micDuration } = useMediaContext();
+  const { audioStreamDestination, audioContext, micDuration } =
+    useMediaContext();
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<UserMediaStatuses>(
     UserMediaStatuses.IDLE,
@@ -66,7 +67,9 @@ export const useUserAudio = ({
       const recorderOptions = {
         mediaTrackConstraints: constraints,
         encoderPath,
-        bufferLength: Math.round(960 * audioContext.current.sampleRate / 24000),
+        bufferLength: Math.round(
+          (960 * audioContext.current.sampleRate) / 24000,
+        ),
         encoderFrameSize: 20,
         encoderSampleRate: 24000,
         maxFramesPerPage: 2,
@@ -84,7 +87,13 @@ export const useUserAudio = ({
         // opus actually always works at 48khz, so it seems this is the proper value to use here.
         micDuration.current = recorder.current.encodedSamplePosition / 48000;
         if (chunk_idx < 5) {
-          console.log(Date.now() % 1000, "Mic Data chunk", chunk_idx++, (recorder.current.encodedSamplePosition - lastpos) / 48000, micDuration.current);
+          console.log(
+            Date.now() % 1000,
+            "Mic Data chunk",
+            chunk_idx++,
+            (recorder.current.encodedSamplePosition - lastpos) / 48000,
+            micDuration.current,
+          );
           lastpos = recorder.current.encodedSamplePosition;
         }
         if (onDataChunk) {
@@ -106,7 +115,6 @@ export const useUserAudio = ({
       if (recorder.current) {
         // setTimeout(() => {recorder.current.start(); setStatus(UserMediaStatuses.RECORDING);}, 1500);
         recorder.current.start();
-
       }
 
       return {

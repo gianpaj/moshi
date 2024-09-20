@@ -6,7 +6,10 @@ type ServerAudioProps = {
   setGetAudioStats: (getAudioStats: () => AudioStats) => void;
   copyCanvasRef?: React.RefObject<HTMLCanvasElement>;
 };
-export const ServerAudio: FC<ServerAudioProps> = ({ setGetAudioStats,copyCanvasRef }) => {
+export const ServerAudio: FC<ServerAudioProps> = ({
+  setGetAudioStats,
+  copyCanvasRef,
+}) => {
   const { analyser, hasCriticalDelay, setHasCriticalDelay } = useServerAudio({
     setGetAudioStats,
   });
@@ -26,8 +29,12 @@ export const ServerAudio: FC<ServerAudioProps> = ({ setGetAudioStats,copyCanvasR
           </button>
         </div>
       )}
-      <div className="server-audio h-4/6 aspect-square" ref={containerRef}>
-        <ServerVisualizer analyser={analyser.current} parent={containerRef} copyCanvasRef={copyCanvasRef}/>
+      <div className="server-audio aspect-square h-4/6" ref={containerRef}>
+        <ServerVisualizer
+          analyser={analyser.current}
+          parent={containerRef}
+          copyCanvasRef={copyCanvasRef}
+        />
       </div>
     </>
   );

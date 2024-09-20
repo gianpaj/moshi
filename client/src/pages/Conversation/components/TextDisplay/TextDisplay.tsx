@@ -5,9 +5,7 @@ type TextDisplayProps = {
   containerRef: React.RefObject<HTMLDivElement>;
 };
 
-export const TextDisplay:FC<TextDisplayProps> = ({
-  containerRef,
-}) => {
+export const TextDisplay: FC<TextDisplayProps> = ({ containerRef }) => {
   const { text } = useServerText();
   const currentIndex = text.length - 1;
   const prevScrollTop = useRef(0);
@@ -23,15 +21,15 @@ export const TextDisplay:FC<TextDisplayProps> = ({
   }, [text]);
 
   return (
-    <div className="h-full w-full max-w-full max-h-full  p-2 text-white">
-        {text.map((t, i) => (
-          <span
-            key={i}
-            className={`${i === currentIndex ? "font-bold" : "font-normal"}`}
-          >
-            {t}
-          </span>
-        ))}
+    <div className="h-full max-h-full w-full max-w-full  p-2 text-white">
+      {text.map((t, i) => (
+        <span
+          key={i}
+          className={`${i === currentIndex ? "font-bold" : "font-normal"}`}
+        >
+          {t}
+        </span>
+      ))}
     </div>
   );
 };

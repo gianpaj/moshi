@@ -25,10 +25,16 @@ type WorkletStats = {
   maxDelay: number;
 };
 
-export const useServerAudio = ({setGetAudioStats}: useServerAudioArgs) => {
-  const { socket  } = useSocketContext();
-  const {startRecording, stopRecording, audioContext, worklet, micDuration, actualAudioPlayed } =
-    useMediaContext();
+export const useServerAudio = ({ setGetAudioStats }: useServerAudioArgs) => {
+  const { socket } = useSocketContext();
+  const {
+    startRecording,
+    stopRecording,
+    audioContext,
+    worklet,
+    micDuration,
+    actualAudioPlayed,
+  } = useMediaContext();
   const analyser = useRef(audioContext.current.createAnalyser());
   worklet.current.connect(analyser.current);
   const startTime = useRef<number | null>(null);
@@ -41,23 +47,22 @@ export const useServerAudio = ({setGetAudioStats}: useServerAudioArgs) => {
     actualAudioPlayed: 0,
     delay: 0,
     minDelay: 0,
-    maxDelay: 0,});
+    maxDelay: 0,
+  });
 
-  const onDecode = useCallback(
-    async (data: Float32Array) => {
-      receivedDuration.current += data.length / audioContext.current.sampleRate;
-      worklet.current.port.postMessage({frame: data, type: "audio", micDuration: micDuration.current});
-    },
-    [],
-  );
+  const onDecode = useCallback(async (data: Float32Array) => {
+    receivedDuration.current += data.length / audioContext.current.sampleRate;
+    worklet.current.port.postMessage({
+      frame: data,
+      type: "audio",
+      micDuration: micDuration.current,
+    });
+  }, []);
 
-  const onWorkletMessage = useCallback(
-    (event: MessageEvent<WorkletStats>) => {
-      workletStats.current = event.data;
-      actualAudioPlayed.current = workletStats.current.actualAudioPlayed;
-    },
-    [],
-  );
+  const onWorkletMessage = useCallback((event: MessageEvent<WorkletStats>) => {
+    workletStats.current = event.data;
+    actualAudioPlayed.current = workletStats.current.actualAudioPlayed;
+  }, []);
   worklet.current.port.onmessage = onWorkletMessage;
 
   const getAudioStats = useCallback(() => {
@@ -66,7 +71,9 @@ export const useServerAudio = ({setGetAudioStats}: useServerAudioArgs) => {
       delay: workletStats.current.delay,
       minPlaybackDelay: workletStats.current.minDelay,
       maxPlaybackDelay: workletStats.current.maxDelay,
-      missedAudioDuration: workletStats.current.totalAudioPlayed - workletStats.current.actualAudioPlayed,
+      missedAudioDuration:
+        workletStats.current.totalAudioPlayed -
+        workletStats.current.actualAudioPlayed,
       totalAudioMessages: totalAudioMessages.current,
     };
   }, []);
@@ -84,7 +91,12 @@ export const useServerAudio = ({setGetAudioStats}: useServerAudioArgs) => {
   let midx = 0;
   const decodeAudio = useCallback((data: Uint8Array) => {
     if (midx < 5) {
-      console.log(Date.now() % 1000, "Got NETWORK message", micDuration.current - workletStats.current.actualAudioPlayed, midx++);
+      console.log(
+        Date.now() % 1000,
+        "Got NETWORK message",
+        micDuration.current - workletStats.current.actualAudioPlayed,
+        midx++,
+      );
     }
     decoderWorker.current.postMessage(
       {
@@ -113,13 +125,13 @@ export const useServerAudio = ({setGetAudioStats}: useServerAudioArgs) => {
     if (!currentSocket) {
       return;
     }
-    worklet.current.port.postMessage({type: "reset"});
+    worklet.current.port.postMessage({ type: "reset" });
     console.log(Date.now() % 1000, "Should start in a bit");
     startRecording();
     currentSocket.addEventListener("message", onSocketMessage);
     totalAudioMessages.current = 0;
     return () => {
-      console.log("Stop recording called in unknown function.")
+      console.log("Stop recording called in unknown function.");
       stopRecording();
       startTime.current = null;
       currentSocket.removeEventListener("message", onSocketMessage);
@@ -140,7 +152,7 @@ export const useServerAudio = ({setGetAudioStats}: useServerAudioArgs) => {
     // the decoding it might help getting some decoded audio out asap.
     decoderWorker.current.postMessage({
       command: "init",
-      bufferLength: 960 * audioContext.current.sampleRate / 24000,
+      bufferLength: (960 * audioContext.current.sampleRate) / 24000,
       decoderSampleRate: 24000,
       outputBufferSampleRate: audioContext.current.sampleRate,
       resampleQuality: 0,
