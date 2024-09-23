@@ -137,6 +137,7 @@ def model_server(client_to_server, server_to_client, args):
 
     model.warmup()
     log("info", "[SERVER] model warmed up")
+    log("info", f"[SERVER] steps: {steps}")
     gen = models.LmGen(
         model=model,
         max_steps=steps + 5,
@@ -153,11 +154,12 @@ def model_server(client_to_server, server_to_client, args):
             data = mx.array(data).transpose(1, 0)[:, :8]
             text_token = gen.step(data)
             text_token = text_token[0].item()
-            audio_tokens = gen.last_audio_tokens()
             if text_token not in (0, 3):
                 _text = text_tokenizer.id_to_piece(text_token)  # type: ignore
                 _text = _text.replace("▁", " ")
+                # print(f"[MOSHI] {_text}") # text output from Moshi model
                 server_to_client.put_nowait((1, _text))
+            audio_tokens = gen.last_audio_tokens() # moving this here seems to help with ththe audio lag
             if audio_tokens is not None:
                 audio_tokens = np.array(audio_tokens).astype(np.uint32)
                 server_to_client.put_nowait((0, audio_tokens))

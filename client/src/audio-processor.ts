@@ -211,7 +211,7 @@ class MoshiProcessor extends AudioWorkletProcessor {
       }
     }
     if (out_idx < output.length) {
-      console.log(
+      console.warn(
         this.timestamp(),
         "Missed some audio",
         output.length - out_idx,

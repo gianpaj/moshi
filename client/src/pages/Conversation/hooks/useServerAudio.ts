@@ -127,7 +127,7 @@ export const useServerAudio = ({ setGetAudioStats }: useServerAudioArgs) => {
     }
     worklet.current.port.postMessage({ type: "reset" });
     console.log(Date.now() % 1000, "Should start in a bit");
-    startRecording();
+    // startRecording();
     currentSocket.addEventListener("message", onSocketMessage);
     totalAudioMessages.current = 0;
     return () => {
